@@ -55,4 +55,22 @@ export function registerGlobalShortcut(win, store) {
       win.isVisible() ? win.hide() : win.show();
     }
   );
+  globalShortcut.register(
+    179,
+    () => {
+      win.webContents.send('play');
+    }
+  );
+  globalShortcut.register(
+    176,
+    () => {
+      win.webContents.send('next');
+    }
+  );
+  globalShortcut.register(
+    177,
+    () => {
+      win.webContents.send('previous');
+    }
+  );
 }
