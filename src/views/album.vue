@@ -28,9 +28,12 @@
           <span v-else>Compilation by Various Artists</span>
         </div>
         <div class="date-and-count">
-          <span v-if="(album.mark & 1048576) === 1048576" class="explicit-symbol"
-            ><ExplicitSymbol
-          /></span>
+          <span
+            v-if="(album.mark & 1048576) === 1048576"
+            class="explicit-symbol"
+          >
+            <ExplicitSymbol/>
+          </span>
           <span :title="album.publishTime | formatDate">{{
             new Date(album.publishTime).getFullYear()
           }}</span>
