@@ -17,7 +17,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-22.04]
+        os: [windows-latest]
 
     steps:
       - name: Check out Git repository
@@ -30,20 +30,6 @@ jobs:
         with:
           node-version: 16
           cache: 'yarn'
-
-      - name: Install RPM & Pacman (on Ubuntu)
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update &&
-          sudo apt-get install --no-install-recommends -y rpm &&
-          sudo apt-get install --no-install-recommends -y libarchive-tools &&
-          sudo apt-get install --no-install-recommends -y libopenjp2-tools
-
-      - name: Install Snapcraft (on Ubuntu)
-        uses: samuelmeuli/action-snapcraft@v1
-        if: startsWith(matrix.os, 'ubuntu')
-        with:
-          snapcraft_token: ${{ secrets.snapcraft_token }}
 
       - id: get_unm_version
         name: Get the installed UNM version
@@ -58,24 +44,6 @@ jobs:
         run: |
           ${{ env.YARN_INSTALL_NOPT }} \
             @unblockneteasemusic/rust-napi-win32-x64-msvc@${{steps.get_unm_version.outputs.unmver}}
-        shell: bash
-
-      - name: Install UNM dependencies for macOS
-        if: runner.os == 'macOS'
-        run: |
-          ${{ env.YARN_INSTALL_NOPT }} \
-            @unblockneteasemusic/rust-napi-darwin-x64@${{steps.get_unm_version.outputs.unmver}} \
-            @unblockneteasemusic/rust-napi-darwin-arm64@${{steps.get_unm_version.outputs.unmver}} \
-            dmg-license
-        shell: bash
-
-      - name: Install UNM dependencies for Linux
-        if: runner.os == 'Linux'
-        run: |
-          ${{ env.YARN_INSTALL_NOPT }} \
-            @unblockneteasemusic/rust-napi-linux-x64-gnu@${{steps.get_unm_version.outputs.unmver}} \
-            @unblockneteasemusic/rust-napi-linux-arm64-gnu@${{steps.get_unm_version.outputs.unmver}} \
-            @unblockneteasemusic/rust-napi-linux-arm-gnueabihf@${{steps.get_unm_version.outputs.unmver}}
         shell: bash
 
       - name: Build/release Electron app
@@ -99,18 +67,6 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: YesPlayMusic-mac
-          path: dist_electron/*-universal.dmg
-          if-no-files-found: ignore
-
-      - uses: actions/upload-artifact@v3
-        with:
           name: YesPlayMusic-win
-          path: dist_electron/*Setup*.exe
-          if-no-files-found: ignore
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: YesPlayMusic-linux
-          path: dist_electron/*.AppImage
+          path: dist_electron/*.exe
           if-no-files-found: ignore
