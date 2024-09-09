@@ -268,7 +268,7 @@
           <svg-icon icon-class="arrow-down" />
         </button>
       </div>
-      <div class="close-button" style="left: 24px" @click="fullscreen">
+      <div class="close-button" style="right: 74px" @click="fullscreen">
         <button>
           <svg-icon v-if="isFullscreen" icon-class="fullscreen-exit" />
           <svg-icon v-else icon-class="fullscreen" />
@@ -599,11 +599,34 @@ export default {
         });
         if (oldHighlightLyricIndex !== this.highlightLyricIndex) {
           const el = document.getElementById(`line${this.highlightLyricIndex}`);
-          if (el)
-            el.scrollIntoView({
-              behavior: 'smooth',
-              block: 'center',
-            });
+          if (el) {
+            const duration = 1000;
+            var start;
+            var animationProgress;
+            const oldY = el.parentNode.scrollTop;
+            const newY = el.offsetTop - window.innerHeight / 2 + el.clientHeight / 2;
+            const distance = oldY - newY;
+            var animation = (timeStamp) => {
+              if (!start) {
+                start = timeStamp;
+              }
+              animationProgress = (timeStamp - start) / duration;
+              if (animationProgress < 1) {
+                el.parentNode.scrollTo(
+                  0,
+                  oldY -
+                    Math.sqrt(
+                      2 * animationProgress - Math.pow(animationProgress, 2)
+                    ) *
+                      distance
+                );
+                window.requestAnimationFrame(animation);
+              } else {
+                window.cancelAnimationFrame(animation);
+              }
+            };
+            window.requestAnimationFrame(animation);
+          }
         }
       }, 50);
     },
@@ -901,6 +924,14 @@ export default {
   color: var(--color-text);
   margin-right: 24px;
   z-index: 0;
+  mask-image: linear-gradient(
+    rgba(0,0,0,0) 5%,
+    rgba(255,255,255,0.5) 15%,
+    rgba(255,255,255,1) 20%,
+    rgba(255,255,255,1) 80%,
+    rgba(255,255,255,0.5) 85%,
+    rgba(255,255,255,0) 95%
+  );
 
   .lyrics-container {
     height: 100%;
@@ -951,6 +982,7 @@ export default {
 
     .highlight div.content {
       transform: scale(1);
+      transition: 0.5s;
       span {
         opacity: 0.98;
         display: inline-block;
