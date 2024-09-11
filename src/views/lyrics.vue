@@ -263,7 +263,7 @@
           </div>
         </transition>
       </div>
-      <div class="close-button" @click="toggleLyrics">
+      <div class="close-button" style="right: 122px" @click="toggleLyrics">
         <button>
           <svg-icon icon-class="arrow-down" />
         </button>
@@ -272,6 +272,11 @@
         <button>
           <svg-icon v-if="isFullscreen" icon-class="fullscreen-exit" />
           <svg-icon v-else icon-class="fullscreen" />
+        </button>
+      </div>
+      <div class="close-button" @click="windowMinimize">
+        <button>
+          <svg-icon icon-class="minimize" />
         </button>
       </div>
     </div>
@@ -293,6 +298,11 @@ import Color from 'color';
 import { isAccountLoggedIn } from '@/utils/auth';
 import { hasListSource, getListSourcePath } from '@/utils/playList';
 import locale from '@/locale';
+
+const electron =
+  process.env.IS_ELECTRON === true ? window.require('electron') : null;
+const ipcRenderer =
+  process.env.IS_ELECTRON === true ? electron.ipcRenderer : null;
 
 export default {
   name: 'Lyrics',
@@ -489,6 +499,9 @@ export default {
         document.documentElement.requestFullscreen();
       }
     },
+    windowMinimize() {
+      ipcRenderer.send('minimize');
+    },
     addToPlaylist() {
       if (!isAccountLoggedIn()) {
         this.showToast(locale.t('toast.needToLogin'));
@@ -536,7 +549,11 @@ export default {
             lyric.length <= 10 &&
             lyric.map(l => l.content).includes('纯音乐，请欣赏');
           if (includeAM) {
-            let reg = /^作(词|曲)\s*(:|：)\s*/;
+            this.lyric = [];
+            this.tlyric = [];
+            this.romalyric = [];
+            // let reg = /^作(词|曲)\s*(:|：)\s*/;
+            /*
             let author = this.currentTrack?.ar[0]?.name;
             lyric = lyric.filter(l => {
               let regExpArr = l.content.match(reg);
@@ -544,6 +561,8 @@ export default {
                 !regExpArr || l.content.replace(regExpArr[0], '') !== author
               );
             });
+            */
+            return false;
           }
           if (lyric.length === 1 && includeAM) {
             this.lyric = [];
@@ -604,9 +623,10 @@ export default {
             var start;
             var animationProgress;
             const oldY = el.parentNode.scrollTop;
-            const newY = el.offsetTop - window.innerHeight / 2 + el.clientHeight / 2;
+            const newY =
+              el.offsetTop - window.innerHeight / 2 + el.clientHeight / 2;
             const distance = oldY - newY;
-            var animation = (timeStamp) => {
+            var animation = timeStamp => {
               if (!start) {
                 start = timeStamp;
               }
@@ -925,12 +945,12 @@ export default {
   margin-right: 24px;
   z-index: 0;
   mask-image: linear-gradient(
-    rgba(0,0,0,0) 5%,
-    rgba(255,255,255,0.5) 15%,
-    rgba(255,255,255,1) 20%,
-    rgba(255,255,255,1) 80%,
-    rgba(255,255,255,0.5) 85%,
-    rgba(255,255,255,0) 95%
+    rgba(0, 0, 0, 0) 5%,
+    rgba(255, 255, 255, 0.5) 15%,
+    rgba(255, 255, 255, 1) 20%,
+    rgba(255, 255, 255, 1) 80%,
+    rgba(255, 255, 255, 0.5) 85%,
+    rgba(255, 255, 255, 0) 95%
   );
 
   .lyrics-container {
