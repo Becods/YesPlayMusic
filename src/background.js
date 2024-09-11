@@ -25,7 +25,6 @@ import { createTray } from '@/electron/tray';
 import { createTouchBar } from './electron/touchBar';
 import { createDockMenu } from './electron/dockMenu';
 import { registerGlobalShortcut } from './electron/globalShortcut';
-import { autoUpdater } from 'electron-updater';
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 import { EventEmitter } from 'events';
 import express from 'express';
@@ -262,35 +261,6 @@ class Background {
           : 'http://localhost:27232'
       );
     }
-  }
-
-  checkForUpdates() {
-    if (isDevelopment) return;
-    log('checkForUpdates');
-    autoUpdater.checkForUpdatesAndNotify();
-
-    const showNewVersionMessage = info => {
-      dialog
-        .showMessageBox({
-          title: '发现新版本 v' + info.version,
-          message: '发现新版本 v' + info.version,
-          detail: '是否前往 GitHub 下载新版本安装包？',
-          buttons: ['下载', '取消'],
-          type: 'question',
-          noLink: true,
-        })
-        .then(result => {
-          if (result.response === 0) {
-            shell.openExternal(
-              'https://github.com/qier222/YesPlayMusic/releases'
-            );
-          }
-        });
-    };
-
-    autoUpdater.on('update-available', info => {
-      showNewVersionMessage(info);
-    });
   }
 
   handleWindowEvents() {
