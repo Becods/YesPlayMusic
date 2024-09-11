@@ -372,9 +372,6 @@ class Background {
         });
       }
 
-      // check for updates
-      this.checkForUpdates();
-
       // create menu
       createMenu(this.window, this.store);
 
